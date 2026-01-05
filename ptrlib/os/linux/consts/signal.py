@@ -1,9 +1,11 @@
 """Linux signal-related constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.SIGKILL
-    consts.SA_RESTART
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.SIGKILL
+        consts.SA_RESTART
 """
 
 # Signal numbers

@@ -106,6 +106,7 @@ class Tube(metaclass=abc.ABCMeta):
         # Defer `after` / `sendafter` / `sendlineafter`
         self._defer_depth: int = 0
         self._defer_queue: list[tuple[DelimiterT | None, int, RegexDelimiterT | None, int | float]] = []
+        self._batch_send: bool = False
 
     def __del__(self):
         self.close()
@@ -214,6 +215,25 @@ class Tube(metaclass=abc.ABCMeta):
     @prompt.setter
     def prompt(self, value: str):
         self._prompt = value
+
+    @property
+    def batch_send(self) -> bool:
+        """Whether `after()` waits are deferred.
+
+        Setting this to True defers `after()` calls. Setting it back to False
+        flushes deferred waits when no other deferral scope is active.
+        """
+        return self._batch_send
+
+    @batch_send.setter
+    def batch_send(self, value: bool):
+        if not isinstance(value, bool):
+            raise TypeError(f"expected bool, not {type(value)}")
+        if value == self._batch_send:
+            return
+        self._batch_send = value
+        if not value and self._defer_depth == 0:
+            self._flush_defer_after()
 
     @property
     def pcap(self) -> PcapFile:
@@ -408,11 +428,10 @@ class Tube(metaclass=abc.ABCMeta):
                 return m
 
             # Need more data
-            with self.timeout(timeout):
-                try:
-                    chunk = self.recv(blocksize)
-                except TubeTimeout as e:
-                    raise TubeTimeout(str(e), buffered=out) from None
+            try:
+                chunk = self.recv(blocksize, timeout=timeout)
+            except TubeTimeout as e:
+                raise TubeTimeout(str(e), buffered=out) from None
 
             out += chunk
 
@@ -555,7 +574,7 @@ class Tube(metaclass=abc.ABCMeta):
             TubeTimeout: If the operation timed out.
             OSError: If a system error occurred.
         """
-        if self._defer_depth > 0:
+        if self._defer_depth > 0 or self._batch_send:
             self._defer_queue.append((delim, blocksize, regex, timeout))
         else:
             self.recvuntil(delim, blocksize, regex, timeout)
@@ -749,7 +768,7 @@ class Tube(metaclass=abc.ABCMeta):
             yield Tube._DeferAfterHandle(self)
         finally:
             self._defer_depth -= 1
-            if self._defer_depth == 0:
+            if self._defer_depth == 0 and not self._batch_send:
                 self._flush_defer_after()
 
     # --- Closing / lifecycle ----------------------------------------------

@@ -1,9 +1,11 @@
 """Linux ptrace(2) constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.PTRACE_ATTACH
-    consts.PTRACE_O_TRACEEXEC
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.PTRACE_ATTACH
+        consts.PTRACE_O_TRACEEXEC
 """
 
 # PTRACE requests

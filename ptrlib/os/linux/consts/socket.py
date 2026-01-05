@@ -4,10 +4,12 @@ Values are taken from Linux UAPI headers and kept static (no runtime probing).
 Only architecture-stable constants are included.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.AF_INET
-    consts.SOCK_STREAM
-    consts.MSG_DONTWAIT
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.AF_INET
+        consts.SOCK_STREAM
+        consts.MSG_DONTWAIT
 """
 
 # Address families / protocol families

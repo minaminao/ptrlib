@@ -3,6 +3,7 @@
 import inspect
 import os
 import random
+import signal
 import unittest
 from logging import FATAL, getLogger
 
@@ -133,6 +134,19 @@ class TestProcess(unittest.TestCase):
         with self.assertRaises(TubeTimeout) as cm:
             p.recv(timeout=0.5)
         self.assertEqual(cm.exception.buffered, b"")
+
+        # recvregex
+        def _alarm_handler(_signum, _frame):
+            raise TimeoutError("recvregex hang detected")
+        prev_handler = signal.signal(signal.SIGALRM, _alarm_handler)
+        signal.alarm(2)
+        try:
+            with self.assertRaises(TubeTimeout) as cm:
+                p.recvregex(r"NEVER_MATCH", timeout=0.5)
+            self.assertEqual(cm.exception.buffered, b"")
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, prev_handler)
 
         # recvonce
         p.sendline(data)

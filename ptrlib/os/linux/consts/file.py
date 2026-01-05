@@ -1,9 +1,11 @@
 """Linux file and filesystem-related constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.O_RDONLY
-    consts.S_IFREG
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.O_RDONLY
+        consts.S_IFREG
 """
 
 # open(2) flags

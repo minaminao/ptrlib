@@ -1,10 +1,12 @@
 """Linux constants grouped by category.
 
 Examples:
-    from ptrlib.os import linux
-    linux.consts.O_RDONLY
-    linux.consts.socket.AF_INET
-    linux.consts.ptrace.PTRACE_ATTACH
+    .. code-block:: python
+
+        from ptrlib.os import linux
+        linux.consts.O_RDONLY
+        linux.consts.socket.AF_INET
+        linux.consts.ptrace.PTRACE_ATTACH
 """
 
 from . import socket as socket_consts

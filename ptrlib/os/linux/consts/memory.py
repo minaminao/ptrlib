@@ -1,9 +1,11 @@
 """Linux memory management constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.MAP_PRIVATE
-    consts.PROT_READ | consts.PROT_WRITE
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.MAP_PRIVATE
+        consts.PROT_READ | consts.PROT_WRITE
 """
 
 # mmap/mprotect protection flags

@@ -1,9 +1,11 @@
 """Linux personality(2) constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.PER_LINUX
-    consts.ADDR_NO_RANDOMIZE
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.PER_LINUX
+        consts.ADDR_NO_RANDOMIZE
 """
 
 # Personality flags (bug emulation, high bits)

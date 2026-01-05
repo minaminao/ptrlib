@@ -9,4 +9,5 @@ ptrlib is a Python library which bundles security-related utilities for CTF play
 
    installation
    quickstart
+   usage
    api

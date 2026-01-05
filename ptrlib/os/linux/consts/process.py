@@ -1,9 +1,11 @@
 """Linux process-related constants.
 
 Examples:
-    from ptrlib.os.linux import consts
-    consts.CLONE_NEWUSER
-    consts.RLIMIT_NOFILE
+    .. code-block:: python
+
+        from ptrlib.os.linux import consts
+        consts.CLONE_NEWUSER
+        consts.RLIMIT_NOFILE
 """
 
 # waitpid/waitid options

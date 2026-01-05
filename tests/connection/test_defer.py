@@ -95,3 +95,36 @@ class TestTubeDefer(unittest.TestCase):
 
         # Exiting the context should flush (i.e., actually perform recv)
         self.assertGreater(recv_calls["n"], 0)
+
+    def test_batch_send_property(self):
+        """`batch_send` should defer `after()` and flush on recv or toggle off.
+        """
+        p = Process("./tests/test.bin/test_echo.x64")
+
+        recv_calls = {"n": 0}
+        orig_recv_impl = p._recv_impl
+        def wrapped_recv_impl(blocksize: int) -> bytes:
+            recv_calls["n"] += 1
+            return orig_recv_impl(blocksize)
+        p._recv_impl = wrapped_recv_impl  # type: ignore[attr-defined]
+
+        p.send(b"PROMPT: ")
+
+        p.batch_send = True
+        p.after(b": ").sendline(b"OK")
+        self.assertEqual(recv_calls["n"], 0)
+
+        self.assertEqual(p.recvline(), b"OK")
+        self.assertGreater(recv_calls["n"], 0)
+
+        prev_calls = recv_calls["n"]
+        p.send(b"PROMPT: ")
+        p.batch_send = True
+        p.after(b": ").sendline(b"HI")
+        self.assertEqual(recv_calls["n"], prev_calls)
+
+        p.batch_send = False
+        self.assertGreater(recv_calls["n"], prev_calls)
+        self.assertEqual(p.recvline(), b"HI")
+
+        p.close()
