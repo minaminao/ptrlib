@@ -103,8 +103,9 @@ class ELF:
         returns:
             bytes: The build-id, or None if there is no build-id section.
         """
-        shdr = self._offset_section(b'.note.gnu.build-id')
-        if shdr is None:
+        try:
+            shdr = self._offset_section(b'.note.gnu.build-id')
+        except KeyError:
             return None
 
         self._parser.stream.seek(shdr - self._load_address)
