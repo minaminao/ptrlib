@@ -1,7 +1,4 @@
-import os
+import sys
 
-if os.name == 'nt':
-    #from .windows import *
-    pass
-else:
+if sys.platform.startswith("linux"):
     from .unix import *

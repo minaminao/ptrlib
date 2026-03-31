@@ -1,11 +1,12 @@
 import hashlib
 import os
+import platform
 import struct
 import unittest
 from logging import getLogger, FATAL
 from ptrlib.connection.proc import Process
 
-_is_windows = os.name == 'nt'
+_is_linux = platform.system() == 'Linux'
 
 
 class TestUnixProcessManager(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestUnixProcessManager(unittest.TestCase):
     """
     def setUp(self):
         getLogger("ptrlib").setLevel(FATAL)
-        if _is_windows:
+        if not _is_linux:
             self.skipTest("This test is intended for the Linux platform")
 
     def test_vmmap(self):

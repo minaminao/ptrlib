@@ -20,10 +20,14 @@ import shlex
 import termios
 import subprocess
 from logging import getLogger
-from ptrlib.debugger.unix import UnixProcessManager
+import sys
+from typing import TYPE_CHECKING
 from ptrlib.binary.packing import p16
 from ptrlib.os.linux import signal_name
 from .tube import Tube
+
+if TYPE_CHECKING:
+    from ptrlib.debugger.unix import UnixProcessManager
 
 
 TcAttrT = list[int | list[int | bytes]]
@@ -66,6 +70,7 @@ class UnixProcess(Tube):
         self._saved_termios: TcAttrT | None = None
         self._timeout: float | None = None
         self._proc: subprocess.Popen | None = None
+        self._process: UnixProcessManager | None = None
 
         self._workdir = os.path.realpath(cwd) if cwd else os.getcwd()
         self._args = args if isinstance(args, list) else shlex.split(args)
@@ -79,8 +84,6 @@ class UnixProcess(Tube):
         self._spawn_process(merge_stderr, use_tty, is_raw)
         self._set_nonblocking(self._fd_r)
         self._set_nonblocking(self._fd_w)
-
-        self._process = UnixProcessManager(self.pid)
 
         self._log_info(f"Successfully created a new process {str(self)}")
 
@@ -118,9 +121,16 @@ class UnixProcess(Tube):
     @property
     def process(self) -> UnixProcessManager:
         """Get a `UnixProcessManager` instance for this process.
+
+        Process debugging helpers are only available on Linux.
         """
         if self._proc is None:
             raise ChildProcessError("Process has terminated")
+        if not sys.platform.startswith("linux"):
+            raise NotImplementedError("Process debugging is only supported on Linux")
+        if self._process is None:
+            from ptrlib.debugger.unix import UnixProcessManager
+            self._process = UnixProcessManager(self.pid)
         return self._process
 
     # --- Abstracts --------------------------------------------------------

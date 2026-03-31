@@ -3,6 +3,7 @@ import ctypes.util
 import functools
 import os
 import re
+import sys
 from logging import getLogger
 from typing import Callable, Dict, Generator, NamedTuple, List, Optional, Union
 from ptrlib.binary.encoding import str2bytes
@@ -10,6 +11,9 @@ from ptrlib.types import GeneratorOrInt
 from .debug import UnixProcessDebugger
 
 logger = getLogger(__name__)
+
+if not sys.platform.startswith("linux"):
+    raise ImportError("ptrlib.debugger.unix.process is only supported on Linux")
 
 _libc = ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True)
 _libc.strerror.argtypes = [ctypes.c_int]

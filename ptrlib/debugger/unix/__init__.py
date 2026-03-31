@@ -1,5 +1,5 @@
-import os
+import sys
 
-if os.name != 'nt':
+if sys.platform.startswith("linux"):
     from .debug import *
     from .process import *
